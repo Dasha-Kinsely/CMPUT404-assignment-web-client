@@ -18,6 +18,24 @@
 # Write your own HTTP GET and POST
 # The point is to understand what you have to send and get experience with it
 
+# Copyright 2020 Yun Tai Liu, https://github.com/Dasha-Kinsely
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Do not use urllib's HTTP GET and POST mechanisms.
+# Write your own HTTP GET and POST
+# The point is to understand what you have to send and get experience with it
+
 import sys
 import socket
 import re
@@ -50,10 +68,11 @@ class HTTPClient(object):
         return int(data.splitlines()[0].split()[1])
 
     def get_headers(self, data):
-        return None
+        head = data.split("\r\n\r\n")[0]
+        return head
 
     def get_body(self, data):
-        print(data.splitlines())
+        # print(data.splitlines())
         return data.split("\r\n\r\n")[1]
 
     def sendall(self, data):
@@ -84,7 +103,7 @@ class HTTPClient(object):
 
     def master_parser(self, callback, method, arg=None):
         if callback.port == None:
-            port = 80
+            port = 80  # suggested by mingwei
         else:
             port = callback.port
         cquery, cparams, cfragment, cscheme, cpath, cnetloc, cpath = callback.query, callback.params, callback.fragment, callback.scheme, callback.path, callback.hostname, callback.path
@@ -95,19 +114,20 @@ class HTTPClient(object):
 
     def generate_header(self, method, netloc, path, arg=None):
         if method == 'GET':
-            return (method + ' ' + path + ' HTTP/1.1\r\n'
-                    'HOST: ' + netloc + '\r\n'
-                    'Connection: close\r\n'
+            return (method + ' ' + path + ' HTTP/1.1\r\n' +
+                    'HOST: ' + netloc + '\r\n' +
+                    'Connection: close\r\n' +
                     '\r\n')
         elif method == 'POST':
             if arg == None:
                 content_length = 0
             else:
                 content_length = len(arg)
-            return (method + ' ' + path + ' HTTP/1.1\r\n' + 'HOST: ' + netloc + '\r\n'
-                    'Content-Type: application/x-www-form-urlencoded\r\n'
-                    'Content-Length: '+str(content_length)+'\r\n'
-                    'Connection: close\r\n\r\n' +
+            return (method + ' ' + path + ' HTTP/1.1\r\n' + 'HOST: ' + netloc + '\r\n' +
+                    'Content-Type: application/x-www-form-urlencoded\r\n' +
+                    'Content-Length: '+str(content_length)+'\r\n' +
+                    'Connection: close\r\n' +
+                    '\r\n' +
                     str(arg))
 
     def GET(self, url, args=None):
